@@ -1,6 +1,7 @@
 import java.net.*;
 import java.io.*;
 
+
 public class interactionThread extends Thread {
     protected Socket socket;
 
@@ -23,16 +24,32 @@ public class interactionThread extends Thread {
                 }
 
                 switch (options) {
-                    case "Hello":
-                    case "hello":
-                        wr.println("Hello user!");
+
+                    case "Request Data":
+                    case "request data":
+                        DataPack requestedData;
+                        JSONworker jw = new JSONworker();
+                        String recordRequest = in.readLine();
+                        requestedData = jw.readJSON(recordRequest);
+                        if(requestedData == null) {
+                            wr.println("Data " + recordRequest + " has not been found or is invalid.");
+                            break;
+                        }
+                        wr.println(requestedData);
                         break;
-                    case "What day is it?":
-                    case "what day is it":
-                        wr.println("Today is a beautiful day!");
+                    case "Send Data":
+                    case "send data":
+                        JSONworker jw2 = new JSONworker();
+                        DataPack dp = new DataPack();
+                        dp.setUserName(in.readLine());
+                        dp.setDate(in.readLine());
+                        jw2.writeJSON(dp);
+                        wr.println(dp.toString() + " successfully added to the database");
                         break;
+
                     default:
                         wr.println("Unknown option");
+                        wr.println("System Disconnecting");
                         socket.close();
                         break;
                 }

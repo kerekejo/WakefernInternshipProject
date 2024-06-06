@@ -44,18 +44,46 @@ public class Client {
                 String response;
 
                 do {
-                    //Initial message to the user, gives them the menu options and sends them to the printwriter to write to the output stream
-                    System.out.println("Select one: Hello, What day is it?, Exit");
+                    System.out.println("Select One: Request Data, Send Data, Exit");
                     options = scanner.nextLine();
-                    pw.println(options);
+                    switch(options) {
+                        case "Request Data":
+                        case "request data":
+                            pw.println(options);
+                            System.out.println("What is the name of the record?");
+                            pw.println(scanner.nextLine());
+                            response = br.readLine();
+                            if(response == null){
+                                System.out.println("No data found.");
+                                break;
+                            }
+                            System.out.println(response);
+                            break;
 
-                    //Unless the option the user selected is "exit" it will respond server answer
-                    if(!options.equalsIgnoreCase("exit")) {
-                        response = br.readLine();
-                        System.out.println(response);
+                        case "Send Data":
+                        case "send data":
+                            pw.println(options);
+                            System.out.println("Username: ");
+                            pw.println(scanner.nextLine());
+                            System.out.println("Date: ");
+                            pw.println(scanner.nextLine());
+                            response = br.readLine();
+
+                            System.out.println(response);
+                            break;
+
+                        case "Exit":
+                        case "exit":
+                            System.out.println("Goodbye");
+                            socket.close();
+                            break;
+
+                        default:
+                            System.out.println("Invalid option");
+                            break;
+
+
                     }
-
-
 
                 } while(!options.equalsIgnoreCase("exit"));
                 socket.close();
