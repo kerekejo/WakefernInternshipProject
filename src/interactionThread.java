@@ -21,29 +21,25 @@ public class interactionThread extends Thread {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter wr = new PrintWriter(socket.getOutputStream(), true);
 
-            while (true) {
-                //Upon user connection check the userID, this allows the client to skip the login process
-                String userId = in.readLine();
 
-                //Static method to check if the user was previously connected
-                if(validateUserID(userId)) {
-                    //Previously connected user connected
-                    System.out.println(userId);
-                    System.out.println("User with the session ID: " + userId + " has reconnected");
-                    break;
-                }
-                else if(validateUser(socket)) {
-                    //Validate a new user. The client assigns a userId upon acceptance of the request and adds userID to the session history.
-                    System.out.println("Client accepted");
+            //Upon user connection check the userID, this allows the client to skip the login process
+            String userId = in.readLine();
 
-                    //Receive a new sessionID from the client and store it
-                    activeUsers.add(in.readLine());
-                    break;
-                } else {
-                    socket.close();
-                    break;
-                }
+            //Static method to check if the user was previously connected
+            if(validateUserID(userId)) {
+                //Previously connected user connected
+                System.out.println(userId);
+                System.out.println("User with the session ID: " + userId + " has reconnected");
+            }
+            else if(validateUser(socket)) {
+                //Validate a new user. The client assigns a userId upon acceptance of the request and adds userID to the session history.
+                System.out.println("Client accepted");
 
+                //Receive a new sessionID from the client and store it
+                activeUsers.add(in.readLine());
+
+            } else {
+                socket.close();
             }
 
         } catch (IOException e) {
