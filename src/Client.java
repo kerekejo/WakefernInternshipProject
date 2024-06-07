@@ -1,73 +1,77 @@
 import java.io.*;
 import java.net.*;
+import java.util.Base64;
 import java.util.Scanner;
 
 
 public class Client {
 
-    //Initialized data; socket, and authorization code; authorization code is currently made final be sure to change the authentication within the server file if you change this.
-    private Socket socket = null;
-    private final int PORT = 5000;
-    private final String authorizationCode = "Lorem Ipsum";
-
 
     //Constructor
-    public Client(String host) {
+    public Client(String host) throws IOException {
         //Attempts to connect to the server
+        int PORT = 5000;
+        //Initialized data; socket, and authorization code; authorization code is currently made final be sure to change the authentication within the server file if you change this.
+        Socket socket = null;
+        BufferedReader br = null;
+
+        //Create new socket and respond about the connections validity
+        socket = new Socket(host, PORT);
+        boolean connect = false;
         try {
-            //Create new socket and respond about the connections validity
-            this.socket = new Socket(host, PORT);
+            int logInAttempts = 0;
 
-            //Authorize the client, using hard-coded authorization code. Essentially this just verifies that the client is a valid connection to the server (can be changed)
-            PrintWriter authorization = new PrintWriter(socket.getOutputStream(), true);
-            authorization.println(authorizationCode);
-
-            System.out.println("Connected to " + host + ":" + PORT);
-            System.out.println("Successfully connected to " + host);
-
-
-
-        } catch (IOException u) {
-            System.out.println("Failed to connect to " + host + ":" + PORT);
-            System.err.println(u);
-            return;
-        }
-        try {
-            while (!socket.isClosed()) {
-                //Creates a buffered reader to read in the input stream and a printwriter to write to the output stream
-                BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            for(int i=0; i<3; i++) {
                 PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
+                br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-                //Initialize a scanner to read in the user input
+                //Authorize the client, using hard-coded authorization code. Essentially this just verifies that the client is a valid connection to the server (can be changed)
+                // PrintWriter authorization = new PrintWriter(socket.getOutputStream(), true);
+                // String authorizationCode = "Lorem Ipsum";
+                //authorization.println(authorizationCode);
+                String code = "";
                 Scanner scanner = new Scanner(System.in);
-                String options = " ";
-                String response;
+                System.out.println("Please enter your username: ");
+                String username = scanner.nextLine();
+                System.out.println("Please enter your password: ");
+                String password = scanner.nextLine();
+                code = username + password;
 
-                do {
-                    //Initial message to the user, gives them the menu options and sends them to the printwriter to write to the output stream
-                    System.out.println("Select one: Hello, What day is it?, Exit");
-                    options = scanner.nextLine();
-                    pw.println(options);
+                Base64.Encoder encoder = Base64.getEncoder();
+                byte[] encoded = encoder.encode(code.getBytes());
 
-                    //Unless the option the user selected is "exit" it will respond server answer
-                    if(!options.equalsIgnoreCase("exit")) {
-                        response = br.readLine();
-                        System.out.println(response);
-                    }
+                String encodedString = new String(encoded);
+                pw.println(encodedString);
+
+                String line = br.readLine();
+                System.out.println(line);
 
 
-
-                } while(!options.equalsIgnoreCase("exit"));
+                if (line.equals("User Validated")) {
+                    System.out.println("Connected to " + host + ":" + PORT);
+                    System.out.println("Successfully connected to " + host);
+                    connect = true;
+                }
+            }
+            if(!connect) {
+                System.out.println("Failed to connect to " + host + ":" + PORT);
                 socket.close();
             }
-        } catch(IOException u) {
-            System.err.println(u);
+        } catch (Exception e) {
+            System.err.println(e);
+            return;
         }
+
+
     }
 
-
-
-
-
-
 }
+/*
+public static void main(String[] args) {
+    Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+        public void run() {
+            System.out.println("In shutdown hook");
+        }
+    }, "Shutdown-thread"));
+}
+ */
