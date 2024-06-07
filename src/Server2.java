@@ -1,27 +1,40 @@
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.net.*;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-
-public class interactionThread extends Thread {
-    protected Socket socket;
-    private static Vector<String> activeUsers = new Vector();
-    public interactionThread(Socket socket) {
-        this.socket = socket;
-    }
-
-    public void run() {
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Base64;
+import java.util.Vector;
 
 
+public class Server2 {
+    private static Vector<String> activeUsers = new Vector<String>();
+
+
+    public Server2() {
+
+
+        // starts server and waits for a connection
         try {
-            //Buffered Reader to read from the inputStream and PrintWriter to write to the output stream
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter wr = new PrintWriter(socket.getOutputStream(), true);
+
+            //Initial message upon server boot
+            int PORT = 5000;
+            ServerSocket server = new ServerSocket(PORT);
+            System.out.println("Server started");
+            System.out.println("Waiting for a client ...");
+
 
             while (true) {
+
+                //Case when a user connects
+                Socket socket = server.accept();
+
+
+                //Initialize a reader and a writer to/from the client
+                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                PrintWriter wr = new PrintWriter(socket.getOutputStream(), true);
+
                 //Upon user connection check the userID, this allows the client to skip the login process
                 String userId = in.readLine();
 
@@ -30,7 +43,8 @@ public class interactionThread extends Thread {
                     //Previously connected user connected
                     System.out.println(userId);
                     System.out.println("User with the session ID: " + userId + " has reconnected");
-                    break;
+                    interactionThread interactionThread = new interactionThread(socket);
+                    interactionThread.start();
                 }
                 else if(validateUser(socket)) {
                     //Validate a new user. The client assigns a userId upon acceptance of the request and adds userID to the session history.
@@ -38,18 +52,18 @@ public class interactionThread extends Thread {
 
                     //Receive a new sessionID from the client and store it
                     activeUsers.add(in.readLine());
-                    break;
+                    interactionThread interactionThread = new interactionThread(socket);
+                    interactionThread.start();
                 } else {
                     socket.close();
-                    break;
                 }
 
             }
-
         } catch (IOException e) {
             System.err.println(e);
             return;
         }
+
     }
 
     //Validate a user's client
@@ -97,4 +111,9 @@ public class interactionThread extends Thread {
         }
     }
 
+    public static void main(String args[])
+    {
+        //Start the Server
+        Server2 server = new Server2();
+    }
 }
