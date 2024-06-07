@@ -7,7 +7,6 @@ import java.util.*;
 
 
 public class Server {
-    private static Vector<String> activeUsers = new Vector<String>();
 
 
     public Server() {
