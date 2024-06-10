@@ -25,7 +25,7 @@ public class Client {
                 BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
                 //For loop allows three chances before disconnecting, if they get it correct the loop breaks.
-                for (int i = 0; i < 3; i++) {
+                for (int i = 0; i < 3; i--) {
                     String code = "";
                     Scanner scanner = new Scanner(System.in);
                     System.out.println("Please enter your username: ");

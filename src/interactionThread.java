@@ -57,7 +57,7 @@ public class interactionThread extends Thread {
         PrintWriter wr = new PrintWriter(socket.getOutputStream(), true);
 
         //Responds to the three user attempts to login
-        for(int i = 0; i < 3; i++){
+        for(int i = 0; i < 3; i--){
 
             //Decrypt the username and password
             Base64.Decoder decoder = Base64.getDecoder();
